@@ -1,7 +1,8 @@
-use std::{io, fs};
+use std::ops::Add;
 use std::path::Path;
 use std::thread::sleep;
 use std::time::Duration;
+use std::{fs, io};
 
 const WATCHE_TICKER: u64 = 6;
 const MAX_FILE_SIZE: u64 = 1024 * 1024;
@@ -26,7 +27,7 @@ pub fn new<'a>(
 impl<'a> FileWatcher<'a> {
     // 读取遍历目录
     fn traverse_dir(&mut self) -> &Self {
-        // @todo exclude path logic 
+        // @todo exclude path logic
         for p in self.path.clone() {
             let _ = self.read_dir(&p);
         }
@@ -40,15 +41,17 @@ impl<'a> FileWatcher<'a> {
                 let file_or_path = entry?.path();
                 if file_or_path.is_file() {
                     // 获取当前file的metadata
-                    let fmeta = fs::metadata(file_or_path).unwrap(); 
+                    let fmeta = fs::metadata(file_or_path).unwrap();
                     // 如果file一个月没有改动过了那就删除
-                    let mut last_modified_time = fmeta.modified();
-                     if std::time::Instant::now() > (last_modified_time + std::time::Duration::from_secs(60 *60 *24 *30))  {
-                        
-                     }
+                    let last_modified_time = fmeta.modified().unwrap();
+                    if std::time::SystemTime::now()
+                        > (last_modified_time
+                            .add(std::time::Duration::from_secs(60 * 60 * 24 * 30)))
+                    {
+
+                    }
                     // 可能需要chunk
                     println!("{:?}", fmeta.modified());
-                    
                 } else {
                     self.read_dir(&file_or_path)?;
                 }
