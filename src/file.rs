@@ -42,10 +42,10 @@ impl<'a> FileWatcher<'a> {
 
     fn read_dir(&mut self, p: &Path) -> io::Result<()> {
         if p.is_dir() {
-            for entry in fs::read_dir(p)? {
-                let file_or_path = entry?.path();
+            for entry in fs::read_dir(p).unwrap() {
+                let file_or_path = entry.unwrap().path();
                 if file_or_path.is_dir() {
-                    self.read_dir(&file_or_path)?;
+                    self.read_dir(&file_or_path).unwrap();
                 } else {
                     // 获取当前file的metadata
                     let file_meta = fs::metadata(&file_or_path).unwrap();
@@ -55,6 +55,7 @@ impl<'a> FileWatcher<'a> {
                         > (last_modified_time.add(std::time::Duration::from_secs(MONTHLY)))
                     {
                         println!("need_remove:{:?}", &file_or_path);
+                        self.remove();
                         // 移交所有权后需要跳出循环
                         continue;
                     }
