@@ -6,7 +6,7 @@ use std::{
     fs,
     fs::File,
     io,
-    io::{prelude::*, BufReader, SeekFrom},
+    io::{prelude::*, SeekFrom},
 };
 
 const WATCH_TICKER: u64 = 6;
@@ -49,7 +49,6 @@ impl<'a> FileWatcher<'a> {
                 } else {
                     // 获取当前file的metadata
                     let file_meta = fs::metadata(&file_or_path).unwrap();
-
                     // 如果file一个月没有改动过了那就删除
                     let last_modified_time = file_meta.modified().unwrap();
                     if std::time::SystemTime::now()
@@ -59,7 +58,6 @@ impl<'a> FileWatcher<'a> {
                         // 移交所有权后需要跳出循环
                         continue;
                     }
-
                     // 切割文件
                     if file_meta.len() > CHUNK_FILE_SIZE {
                         println!(
@@ -96,9 +94,9 @@ impl<'a> FileWatcher<'a> {
             // 读取内容
             return Ok(());
         } else {
-            fd.seek(SeekFrom::Start(*seek))?;
+            fd.seek(SeekFrom::Start(*seek)).unwrap();
             let end_seek = (*seek + CHUNK_FILE_SIZE) as i64;
-            fd.seek(SeekFrom::End(end_seek))?;
+            fd.seek(SeekFrom::End(end_seek)).unwrap();
             let mut buf: Vec<u8> = Vec::with_capacity(CHUNK_FILE_SIZE as usize);
             // 读取 | start  -> end  | buf contents
             fd.read(&mut buf).unwrap();
