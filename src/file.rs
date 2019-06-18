@@ -88,16 +88,23 @@ impl<'a> FileWatcher<'a> {
         // 如果现在的((file_meta.len()) - seek > CHUNK_FILE_SIZE), 计算下一次seek(seek + CHUNK_FILE_SIZE)的偏移, 分配内存为100mb,继续切割.
         if (file_meta.len() - *seek) <= CHUNK_FILE_SIZE {
             fd.seek(SeekFrom::Start(*seek))?;
-            // 读取内容
+            let mut buf: Vec<u8> = Vec::with_capacity(file_meta.len() as usize);
+            // 读取 | start  -> end  | buf contents
+            fd.read(&mut buf).unwrap();
+            // u8 转换成string 然后存入文件
 
+            // 读取内容
             return Ok(());
         } else {
             fd.seek(SeekFrom::Start(*seek))?;
             let end_seek = (*seek + CHUNK_FILE_SIZE) as i64;
             fd.seek(SeekFrom::End(end_seek))?;
+            let mut buf: Vec<u8> = Vec::with_capacity(CHUNK_FILE_SIZE as usize);
             // 读取 | start  -> end  | buf contents
-            // let contents =
-            // 把contents写入新的文件.
+            fd.read(&mut buf).unwrap();
+            // u8 转换成string 然后存入文件
+
+            // 递归下一次
             let _ = self.chunk_file(fd, file_meta, &mut (end_seek as u64));
         }
         Ok(())
