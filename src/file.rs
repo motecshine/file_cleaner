@@ -1,5 +1,5 @@
 use std::ops::Add;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::{
     fs,
     fs::File,
@@ -34,7 +34,7 @@ impl<'a> FileWatcher<'a> {
     fn traverse_dir(&mut self) -> &Self {
         // @todo exclude path logic
         for p in self.path.clone() {
-            match self.chunk(&p) {
+            match self.recursive_dir(&p) {
                 Ok(_) => println!("nothing todo"),
                 Err(err) => println!("err: {:?}", err.to_string()),
             }
@@ -42,62 +42,55 @@ impl<'a> FileWatcher<'a> {
         self
     }
 
-    fn chunk(&mut self, p: &Path) -> io::Result<()> {
+
+    fn recursive_dir(&mut self, p: &Path) -> io::Result<()> {
         if p.is_dir() {
             for entry in fs::read_dir(p).unwrap() {
                 let file_or_path = entry.unwrap().path();
                 if file_or_path.is_dir() {
-                    self.chunk(&file_or_path).unwrap()
+                    self.recursive_dir(&file_or_path).unwrap()
                 } else {
-                    println!("需要切割的文件: {:?}", file_or_path);
-                    let mut fd = File::open(&file_or_path).unwrap();
-                    let origin_file_name = file_or_path.file_name().unwrap().to_str().unwrap();
-                    let origin_file_size = file_or_path.metadata().unwrap().len();
-                    println!("文件大小: {:?}", origin_file_size);
-                    let remaining_size = origin_file_size % CHUNK_FILE_SIZE;
-                    println!("不能被整除, 剩余量: {:?}bytes", remaining_size);
-                    let suffix = 0;
-                    // 先处理剩余的
-                    if remaining_size > 0 {
-                        let new_file_name = self.new_file_name(origin_file_name, suffix);
-                        println!("新的文件名: {:?}", new_file_name);
-                        // 从源文件头部读取remaining_size大小的buf
-                        let mut remaining_buf = Box::new(vec![0; remaining_size as usize]);
-                        match fd.read(&mut remaining_buf) {
-                            Ok(_) => {
-                                let mut new_file = File::create(new_file_name).unwrap();
-                                new_file.write(&mut remaining_buf).unwrap();
-                                println!("处理剩余buf成功! {:?}", remaining_buf.len());
-                                // 处理剩余的文件
-                                let chunk_count = origin_file_size / CHUNK_FILE_SIZE;
-                                println!("chunk_count! {:?}", chunk_count);
-                                let mut seek_flag = remaining_size;
-                                for index in 1..(chunk_count + 1) {
-                                    fd.seek(SeekFrom::Start(seek_flag)).unwrap();
-                                    let mut buf = Box::new(vec![0; CHUNK_FILE_SIZE as usize]);
-                                    match fd.read(&mut buf) {
-                                        Ok(_) => {
-                                            let new_file_name = self.new_file_name(origin_file_name, index as i32);
-                                            println!("文件名! {:?}", new_file_name);
-                                            let mut new_file = File::create(new_file_name)?;
-                                            new_file.write(&mut buf).unwrap();
-                                            println!("处理剩余buf成功! {:?}", buf.len());
-                                            // 增加偏移量
-                                            seek_flag += CHUNK_FILE_SIZE;
-                                        }
-                                        Err(err) => println!("err: {:?}", err.to_string()),
-                                    }
-                                }
-                            }
-                            Err(err) => println!("err: {:?}", err.to_string()),
-                        }
-                    }
+                    self.chunk(file_or_path)
                 }
             }
         } else {
             println!("p: {:?} ", p);
         }
         Ok(())
+    }
+
+    fn chunk(&mut self, path: PathBuf) {
+        let mut origin_fd = File::open(&path).unwrap();
+        let origin_file_name = path.file_name().unwrap().to_str().unwrap();
+        let origin_file_size = path.metadata().unwrap().len();
+        println!("文件大小: {:?}", origin_file_size);
+        let remaining_size = origin_file_size % CHUNK_FILE_SIZE;
+        println!("不能被整除, 剩余量: {:?}bytes", remaining_size);
+        let mut chunk_count = origin_file_size / CHUNK_FILE_SIZE;
+        let suffix = 0;
+        let mut seek_flag:u64 = 0;
+        let mut chunk_start = 0;
+        // 先处理剩余的
+        if remaining_size > 0 {
+            self.create_new_file(remaining_size, suffix, seek_flag, &mut origin_fd, origin_file_name);
+            seek_flag += remaining_size;
+            chunk_start += 1;
+            chunk_count += 1;
+        }
+
+        for index in chunk_start..chunk_count {
+            self.create_new_file(CHUNK_FILE_SIZE, index as i32, seek_flag, &mut origin_fd, origin_file_name);
+        }
+    }
+
+    fn create_new_file(&mut self, buf_size: u64, file_suffix: i32, seek_flag: u64, origin_fd: &mut File, origin_file_name: &str) {
+        origin_fd.seek(SeekFrom::Start(seek_flag)).unwrap();
+        let file_name = self.new_file_name(origin_file_name, file_suffix);
+        // 从源文件头部读取remaining_size大小的buf
+        let mut buf = Box::new(vec![0; buf_size as usize]);
+        origin_fd.read(&mut buf).unwrap();
+        let mut fd = File::create(file_name).unwrap();
+        fd.write(&mut buf).unwrap();
     }
 
     fn new_file_name(&mut self, origin_file_name: &str, suffix: i32) -> String {
