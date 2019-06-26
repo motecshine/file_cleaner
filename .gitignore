@@ -1,2 +1,3 @@
 /target
 **/*.rs.bk
+/file/text.txt_*
