@@ -19,7 +19,6 @@ pub fn new() -> FileWatcher {
         .map(|s| s.to_string())
         .collect();
     let chunk_size = env::var("CHUNK_FILE_SIZE").unwrap().parse::<u64>().unwrap();
-    println!("scan_path: {:?}", path);
     FileWatcher { path, chunk_size }
 }
 
