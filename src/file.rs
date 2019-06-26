@@ -1,3 +1,4 @@
+use std::env;
 use std::path::{Path, PathBuf};
 use std::{
     fs,
@@ -6,30 +7,26 @@ use std::{
     io::{prelude::*, SeekFrom},
 };
 
-const WATCH_TICKER: u64 = 6;
 const CHUNK_FILE_SIZE: u64 = 1024 * 1024 * 2; // 2mb
-pub const PATH: &str = "/Users/zhuhaifeng/Desktop/workspace/rustcode/simple-file-watcher/file/";
-pub struct FileWatcher<'a> {
-    pub path: &'a mut Vec<Box<&'a Path>>,
-    pub exclude_path: &'a mut Vec<Box<&'a Path>>,
+pub struct FileWatcher {
+    pub path: Vec<String>,
 }
 
-pub fn new<'a>(
-    path: &'a mut Vec<Box<&'a Path>>,
-    exclude_path: &'a mut Vec<Box<&'a Path>>,
-) -> FileWatcher<'a> {
-    FileWatcher { path, exclude_path }
+pub fn new() -> FileWatcher {
+    let path: Vec<String> = env::var("SCAN_PATH")
+        .unwrap()
+        .split(",")
+        .map(|s| s.to_string())
+        .collect();
+    FileWatcher { path }
 }
 
-impl<'a> FileWatcher<'a> {
+impl FileWatcher {
     // 读取遍历目录
-    fn traverse_dir(&mut self) -> &Self {
-        // @todo exclude path logic
-        for p in self.path.clone() {
-            match self.recursive_dir(&p) {
-                Ok(_) => println!("nothing todo"),
-                Err(err) => println!("err: {:?}", err.to_string()),
-            }
+    fn traverse_dir(&mut self, path: &str) -> &Self {
+        match self.recursive_dir(Path::new(path)) {
+            Ok(_) => println!("nothing todo"),
+            Err(err) => println!("err: {:?}", err.to_string()),
         }
         self
     }
@@ -78,8 +75,9 @@ impl<'a> FileWatcher<'a> {
                 index as i32,
                 seek_flag,
                 &mut origin_fd,
-                origin_file_name,
+                path.to_str().unwrap(),
             );
+            seek_flag += CHUNK_FILE_SIZE;
         }
     }
 
@@ -93,7 +91,6 @@ impl<'a> FileWatcher<'a> {
     ) {
         origin_fd.seek(SeekFrom::Start(seek_flag)).unwrap();
         let file_name = self.new_file_name(origin_file_name, file_suffix);
-        // 从源文件头部读取remaining_size大小的buf
         let mut buf = Box::new(vec![0; buf_size as usize]);
         origin_fd.read(&mut buf).unwrap();
         let mut fd = File::create(file_name).unwrap();
@@ -101,10 +98,12 @@ impl<'a> FileWatcher<'a> {
     }
 
     fn new_file_name(&mut self, origin_file_name: &str, suffix: i32) -> String {
-        PATH.to_owned() + origin_file_name + "_" + suffix.to_string().as_str()
+        origin_file_name.to_owned() + "_" + suffix.to_string().as_str()
     }
 
     pub fn run(&mut self) {
-        self.traverse_dir();
+        for path in self.path.clone() {
+            self.traverse_dir(&path);
+        }
     }
 }
