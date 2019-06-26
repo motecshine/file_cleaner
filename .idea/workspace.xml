@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d1d75277-763b-4c4c-845f-9ae0357be79e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/file.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/file.rs" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,12 +21,21 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/file.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="307">
-              <caret line="68" column="16" selection-start-line="68" selection-start-column="16" selection-end-line="68" selection-end-column="16" />
+            <state relative-caret-position="431">
+              <caret line="54" column="13" lean-forward="true" selection-start-line="54" selection-start-column="13" selection-end-line="54" selection-end-column="13" />
               <folding>
                 <element signature="e#4025#4026#0" expanded="true" />
                 <element signature="e#4060#4061#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/file/text.txt_0">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="656">
+              <caret line="4047" column="14" lean-forward="true" selection-start-line="4047" selection-start-column="14" selection-end-line="4047" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -159,12 +167,12 @@
       <option name="presentableId" value="Default" />
       <updated>1561530379594</updated>
       <workItem from="1561530380896" duration="1310000" />
-      <workItem from="1561532062194" duration="9331000" />
+      <workItem from="1561532062194" duration="9530000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="10641000" />
+    <option name="totallyTimeSpent" value="10840000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="172" y="23" width="1406" height="1016" extended-state="0" />
@@ -285,15 +293,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/file/text.txt_0">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="855">
-          <caret line="57" column="22" lean-forward="true" selection-start-line="57" selection-start-column="22" selection-end-line="57" selection-end-column="22" />
+        <state relative-caret-position="656">
+          <caret line="4047" column="14" lean-forward="true" selection-start-line="4047" selection-start-column="14" selection-end-line="4047" selection-end-column="14" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/file.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="307">
-          <caret line="68" column="16" selection-start-line="68" selection-start-column="16" selection-end-line="68" selection-end-column="16" />
+        <state relative-caret-position="431">
+          <caret line="54" column="13" lean-forward="true" selection-start-line="54" selection-start-column="13" selection-end-line="54" selection-end-column="13" />
           <folding>
             <element signature="e#4025#4026#0" expanded="true" />
             <element signature="e#4060#4061#0" expanded="true" />

@@ -54,7 +54,7 @@ impl<'a> FileWatcher<'a> {
                 }
             }
         } else {
-            println!("p: {:?} ", p);
+            self.chunk(PathBuf::from(p))
         }
         Ok(())
     }
