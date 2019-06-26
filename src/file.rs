@@ -18,6 +18,7 @@ pub fn new() -> FileWatcher {
         .split(",")
         .map(|s| s.to_string())
         .collect();
+    println!("scan_path: {:?}", path);
     FileWatcher { path }
 }
 

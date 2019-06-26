@@ -1,5 +1,5 @@
 [package]
-name = "FileCutter"
+name = "file_cutter"
 version = "0.1.0"
 authors = ["朱海峰 <zhuhaifeng@parkingwang.com>"]
 edition = "2018"
