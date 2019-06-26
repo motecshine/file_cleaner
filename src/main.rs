@@ -3,7 +3,7 @@ pub mod file;
 
 fn main() {
     let mut path = vec![Box::new(Path::new(
-        "/Users/zhuhaifeng/Desktop/workspace/rust/filewatcher/src",
+        "/Users/zhuhaifeng/Desktop/workspace/rust/filewatcher/file",
     ))];
     let mut exclude_path = vec![Box::new(Path::new(
         "/Users/zhuhaifeng/Desktop/workspace/rust/filewatcher/target",
