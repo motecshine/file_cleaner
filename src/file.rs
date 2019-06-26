@@ -1,4 +1,3 @@
-use std::ops::Add;
 use std::path::{Path, PathBuf};
 use std::{
     fs,
@@ -9,11 +8,8 @@ use std::{
 
 const WATCH_TICKER: u64 = 6;
 const CHUNK_FILE_SIZE: u64 = 1024 * 1024 * 2; // 2mb
-const MONTHLY: u64 = 60 * 60 * 24 * 30;
 pub const PATH: &str = "/Users/zhuhaifeng/Desktop/workspace/rustcode/simple-file-watcher/file/";
 pub struct FileWatcher<'a> {
-    // 指定多少时间刷新获取一次目录. 默认10分钟
-    pub watcher_ticker: u64,
     pub path: &'a mut Vec<Box<&'a Path>>,
     pub exclude_path: &'a mut Vec<Box<&'a Path>>,
 }
@@ -22,11 +18,7 @@ pub fn new<'a>(
     path: &'a mut Vec<Box<&'a Path>>,
     exclude_path: &'a mut Vec<Box<&'a Path>>,
 ) -> FileWatcher<'a> {
-    FileWatcher {
-        watcher_ticker: WATCH_TICKER,
-        path,
-        exclude_path,
-    }
+    FileWatcher { path, exclude_path }
 }
 
 impl<'a> FileWatcher<'a> {
