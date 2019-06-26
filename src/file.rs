@@ -38,7 +38,7 @@ impl FileWatcher {
             for entry in fs::read_dir(p).unwrap() {
                 let file_or_path = entry.unwrap().path();
                 if file_or_path.is_dir() {
-                    self.recursive_dir(&file_or_path).unwrap()
+                    self.recursive_child_dir(&file_or_path).unwrap()
                 } else {
                     self.chunk(file_or_path)
                 }
@@ -54,7 +54,7 @@ impl FileWatcher {
         let origin_file_name = path.file_name().unwrap().to_str().unwrap();
         let origin_file_size = path.metadata().unwrap().len();
         let remaining_size = origin_file_size % self.chunk_size;
-        let mut chunk_count = origin_file_size /  self.chunk_size;
+        let mut chunk_count = origin_file_size / self.chunk_size;
         let suffix = 0;
         let mut seek_flag: u64 = 0;
         let mut chunk_start = 0;
