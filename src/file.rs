@@ -7,9 +7,9 @@ use std::{
     io::{prelude::*, SeekFrom},
 };
 
-const CHUNK_FILE_SIZE: u64 = 1024 * 1024 * 2; // 2mb
 pub struct FileWatcher {
     pub path: Vec<String>,
+    pub chunk_size: u64,
 }
 
 pub fn new() -> FileWatcher {
@@ -18,21 +18,22 @@ pub fn new() -> FileWatcher {
         .split(",")
         .map(|s| s.to_string())
         .collect();
+    let chunk_size = env::var("CHUNK_FILE_SIZE").unwrap().parse::<u64>().unwrap();
     println!("scan_path: {:?}", path);
-    FileWatcher { path }
+    FileWatcher { path, chunk_size }
 }
 
 impl FileWatcher {
     // 读取遍历目录
     fn traverse_dir(&mut self, path: &str) -> &Self {
-        match self.recursive_dir(Path::new(path)) {
+        match self.recursive_child_dir(Path::new(path)) {
             Ok(_) => println!("nothing todo"),
             Err(err) => println!("err: {:?}", err.to_string()),
         }
         self
     }
 
-    fn recursive_dir(&mut self, p: &Path) -> io::Result<()> {
+    fn recursive_child_dir(&mut self, p: &Path) -> io::Result<()> {
         if p.is_dir() {
             for entry in fs::read_dir(p).unwrap() {
                 let file_or_path = entry.unwrap().path();
@@ -52,8 +53,8 @@ impl FileWatcher {
         let mut origin_fd = File::open(&path).unwrap();
         let origin_file_name = path.file_name().unwrap().to_str().unwrap();
         let origin_file_size = path.metadata().unwrap().len();
-        let remaining_size = origin_file_size % CHUNK_FILE_SIZE;
-        let mut chunk_count = origin_file_size / CHUNK_FILE_SIZE;
+        let remaining_size = origin_file_size % self.chunk_size;
+        let mut chunk_count = origin_file_size /  self.chunk_size;
         let suffix = 0;
         let mut seek_flag: u64 = 0;
         let mut chunk_start = 0;
@@ -72,13 +73,13 @@ impl FileWatcher {
 
         for index in chunk_start..chunk_count {
             self.create_new_file(
-                CHUNK_FILE_SIZE,
+                self.chunk_size,
                 index as i32,
                 seek_flag,
                 &mut origin_fd,
                 path.to_str().unwrap(),
             );
-            seek_flag += CHUNK_FILE_SIZE;
+            seek_flag += self.chunk_size;
         }
     }
 

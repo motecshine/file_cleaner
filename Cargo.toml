@@ -1,7 +1,7 @@
 [package]
 name = "file_cutter"
 version = "0.1.0"
-authors = ["朱海峰 <zhuhaifeng@parkingwang.com>"]
+authors = ["朱海峰 <shinemotec@gmail.com>"]
 edition = "2018"
 
 [dependencies]
