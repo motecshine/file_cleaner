@@ -1,7 +1,9 @@
 [package]
-name = "filewatcher"
+name = "FileCutter"
 version = "0.1.0"
 authors = ["朱海峰 <zhuhaifeng@parkingwang.com>"]
 edition = "2018"
 
 [dependencies]
+dotenv = "0.14.1"
+failure = "0.1.5"
