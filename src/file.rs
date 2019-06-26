@@ -42,7 +42,6 @@ impl<'a> FileWatcher<'a> {
         self
     }
 
-
     fn recursive_dir(&mut self, p: &Path) -> io::Result<()> {
         if p.is_dir() {
             for entry in fs::read_dir(p).unwrap() {
@@ -63,27 +62,43 @@ impl<'a> FileWatcher<'a> {
         let mut origin_fd = File::open(&path).unwrap();
         let origin_file_name = path.file_name().unwrap().to_str().unwrap();
         let origin_file_size = path.metadata().unwrap().len();
-        println!("文件大小: {:?}", origin_file_size);
         let remaining_size = origin_file_size % CHUNK_FILE_SIZE;
-        println!("不能被整除, 剩余量: {:?}bytes", remaining_size);
         let mut chunk_count = origin_file_size / CHUNK_FILE_SIZE;
         let suffix = 0;
-        let mut seek_flag:u64 = 0;
+        let mut seek_flag: u64 = 0;
         let mut chunk_start = 0;
-        // 先处理剩余的
         if remaining_size > 0 {
-            self.create_new_file(remaining_size, suffix, seek_flag, &mut origin_fd, origin_file_name);
+            self.create_new_file(
+                remaining_size,
+                suffix,
+                seek_flag,
+                &mut origin_fd,
+                origin_file_name,
+            );
             seek_flag += remaining_size;
             chunk_start += 1;
             chunk_count += 1;
         }
 
         for index in chunk_start..chunk_count {
-            self.create_new_file(CHUNK_FILE_SIZE, index as i32, seek_flag, &mut origin_fd, origin_file_name);
+            self.create_new_file(
+                CHUNK_FILE_SIZE,
+                index as i32,
+                seek_flag,
+                &mut origin_fd,
+                origin_file_name,
+            );
         }
     }
 
-    fn create_new_file(&mut self, buf_size: u64, file_suffix: i32, seek_flag: u64, origin_fd: &mut File, origin_file_name: &str) {
+    fn create_new_file(
+        &mut self,
+        buf_size: u64,
+        file_suffix: i32,
+        seek_flag: u64,
+        origin_fd: &mut File,
+        origin_file_name: &str,
+    ) {
         origin_fd.seek(SeekFrom::Start(seek_flag)).unwrap();
         let file_name = self.new_file_name(origin_file_name, file_suffix);
         // 从源文件头部读取remaining_size大小的buf
