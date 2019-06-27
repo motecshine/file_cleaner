@@ -14,7 +14,6 @@ pub struct FileWatcher {
     path: Vec<String>,
     chunk_size: u64,
     thread_pool: threadpool::ThreadPool,
-    thread_pool_num: usize,
 }
 
 #[inline]
@@ -30,7 +29,6 @@ pub fn new() -> Result<FileWatcher, Error> {
         path,
         chunk_size,
         thread_pool,
-        thread_pool_num,
     })
 }
 
