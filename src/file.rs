@@ -50,13 +50,15 @@ impl FileWatcher {
     }
 
     fn chunk(&mut self, path: PathBuf) {
+        let origin_file_size = path.metadata().unwrap().len();
+        let remaining_size = origin_file_size % self.chunk_size;
         let mut origin_fd = File::open(&path).unwrap();
         let mut chunk_count = origin_file_size / self.chunk_size;
         let mut seek_flag: u64 = 0;
         let mut chunk_start = 0;
-        if path.metadata().unwrap().len() % self.chunk_size > 0 {
+        if remaining_size > 0 {
             self.create_new_file(
-                remaining_size as usize,
+                remaining_size,
                 0,
                 seek_flag,
                 &mut origin_fd,
@@ -68,10 +70,8 @@ impl FileWatcher {
         }
 
         for index in chunk_start..chunk_count {
-            origin_fd.seek(SeekFrom::Start(seek_flag)).unwrap();
-            origin_fd.read(&mut buf).unwrap();
             self.create_new_file(
-                self.chunk_size as usize,
+                self.chunk_size,
                 index,
                 seek_flag,
                 &mut origin_fd,
@@ -84,15 +84,17 @@ impl FileWatcher {
     #[inline]
     fn create_new_file(
         &mut self,
-        buf_size: usize,
+        buf_size: u64,
         file_suffix: u64,
         seek_flag: u64,
         origin_fd: &mut File,
         origin_file_name: &str,
     ) {
         let file_name = self.new_file_name(origin_file_name, file_suffix);
-        let mut buf = Box::new(vec![0; buf_size]);
+        let mut buf = Box::new(vec![0; buf_size as usize]);
         let mut fd = File::create(file_name).unwrap();
+        origin_fd.seek(SeekFrom::Start(seek_flag)).unwrap();
+        origin_fd.read(&mut buf).unwrap();
         fd.write(&mut buf).unwrap();
     }
 
