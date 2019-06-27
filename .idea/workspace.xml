@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d1d75277-763b-4c4c-845f-9ae0357be79e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/file.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/file.rs" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,8 +21,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/file.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="8" selection-start-line="14" selection-start-column="8" selection-end-line="14" selection-end-column="8" />
+            <state relative-caret-position="268">
+              <caret line="53" column="64" selection-start-line="53" selection-start-column="29" selection-end-line="53" selection-end-column="64" />
             </state>
           </provider>
         </entry>
@@ -191,18 +190,18 @@
       <workItem from="1561530380896" duration="1310000" />
       <workItem from="1561532062194" duration="10357000" />
       <workItem from="1561544793652" duration="2226000" />
-      <workItem from="1561551960219" duration="4461000" />
+      <workItem from="1561551960219" duration="4775000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="18354000" />
+    <option name="totallyTimeSpent" value="18668000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="172" y="23" width="1406" height="1016" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49891776" visible="true" weight="0.16202345" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49891776" visible="true" weight="0.16202345" />
       <window_info id="Structure" order="1" sideWeight="0.50108224" side_tool="true" weight="0.15762463" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -219,7 +218,7 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" weight="0.32900432" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
       <window_info anchor="bottom" id="Version Control" order="11" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -335,8 +334,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/file.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="8" selection-start-line="14" selection-start-column="8" selection-end-line="14" selection-end-column="8" />
+        <state relative-caret-position="268">
+          <caret line="53" column="64" selection-start-line="53" selection-start-column="29" selection-end-line="53" selection-end-column="64" />
         </state>
       </provider>
     </entry>
