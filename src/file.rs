@@ -12,6 +12,7 @@ pub struct FileWatcher {
     pub chunk_size: u64,
 }
 
+#[inline]
 pub fn new() -> FileWatcher {
     let path: Vec<String> = env::var("SCAN_PATH")
         .unwrap()
@@ -50,7 +51,6 @@ impl FileWatcher {
 
     fn chunk(&mut self, path: PathBuf) {
         let mut origin_fd = File::open(&path).unwrap();
-        let origin_file_name = path.file_name().unwrap().to_str().unwrap();
         let origin_file_size = path.metadata().unwrap().len();
         let remaining_size = origin_file_size % self.chunk_size;
         let mut chunk_count = origin_file_size / self.chunk_size;
@@ -63,7 +63,7 @@ impl FileWatcher {
                 suffix,
                 seek_flag,
                 &mut origin_fd,
-                origin_file_name,
+                path.file_name().unwrap().to_str().unwrap(),
             );
             seek_flag += remaining_size;
             chunk_start += 1;
@@ -71,9 +71,11 @@ impl FileWatcher {
         }
 
         for index in chunk_start..chunk_count {
+            origin_fd.seek(SeekFrom::Start(seek_flag)).unwrap();
+            origin_fd.read(&mut buf).unwrap();
             self.create_new_file(
                 self.chunk_size,
-                index as i32,
+                index,
                 seek_flag,
                 &mut origin_fd,
                 path.to_str().unwrap(),
@@ -82,23 +84,22 @@ impl FileWatcher {
         }
     }
 
+    #[inline]
     fn create_new_file(
         &mut self,
         buf_size: u64,
-        file_suffix: i32,
+        file_suffix: u64,
         seek_flag: u64,
         origin_fd: &mut File,
         origin_file_name: &str,
     ) {
-        origin_fd.seek(SeekFrom::Start(seek_flag)).unwrap();
         let file_name = self.new_file_name(origin_file_name, file_suffix);
         let mut buf = Box::new(vec![0; buf_size as usize]);
-        origin_fd.read(&mut buf).unwrap();
         let mut fd = File::create(file_name).unwrap();
         fd.write(&mut buf).unwrap();
     }
 
-    fn new_file_name(&mut self, origin_file_name: &str, suffix: i32) -> String {
+    fn new_file_name(&mut self, origin_file_name: &str, suffix: u64) -> String {
         origin_file_name.to_owned() + "_" + suffix.to_string().as_str()
     }
 
