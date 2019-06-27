@@ -8,3 +8,4 @@ edition = "2018"
 dotenv = { git= "https://github.com/dotenv-rs/dotenv.git" }
 dotenv_codegen = "0.14.1"
 failure = "0.1.5"
+threadpool = "1.7.1"

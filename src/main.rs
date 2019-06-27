@@ -1,7 +1,4 @@
-extern crate dotenv;
-extern crate failure;
 use dotenv::dotenv;
-
 pub mod file;
 fn main() {
     dotenv().ok();

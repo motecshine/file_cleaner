@@ -1,17 +1,20 @@
+use failure::Error;
 use std::env;
 use std::path::{Path, PathBuf};
-
-use failure::Error;
 use std::{
     fs,
     fs::File,
     io,
     io::{prelude::*, SeekFrom},
 };
+use threadpool::ThreadPool;
 
+#[derive(Clone)]
 pub struct FileWatcher {
-    pub path: Vec<String>,
-    pub chunk_size: u64,
+    path: Vec<String>,
+    chunk_size: u64,
+    thread_pool: threadpool::ThreadPool,
+    thread_pool_num: usize,
 }
 
 #[inline]
@@ -21,7 +24,14 @@ pub fn new() -> Result<FileWatcher, Error> {
         .map(|s| s.to_string())
         .collect();
     let chunk_size = env::var("CHUNK_FILE_SIZE")?.parse::<u64>()?;
-    Ok(FileWatcher { path, chunk_size })
+    let thread_pool_num = env::var("THREAD_POOL")?.parse::<usize>()?;
+    let thread_pool = ThreadPool::with_name("file cutter worker".to_string(), thread_pool_num);
+    Ok(FileWatcher {
+        path,
+        chunk_size,
+        thread_pool,
+        thread_pool_num,
+    })
 }
 
 impl FileWatcher {
@@ -40,12 +50,23 @@ impl FileWatcher {
                 if file_or_path.is_dir() {
                     self.recursive_child_dir(&file_or_path)?
                 } else {
-                    self.chunk(file_or_path)?;
+                    let mut shadow = self.clone();
+                    self.thread_pool
+                        .execute(move || match shadow.chunk(file_or_path) {
+                            Ok(_) => {}
+                            Err(err) => println!("chunk task err: {:?}", err.to_string()),
+                        });
                 }
             }
         } else {
-            self.chunk(PathBuf::from(p))?;
+            let mut shadow = self.clone();
+            let path = PathBuf::from(p);
+            self.thread_pool.execute(move || match shadow.chunk(path) {
+                Ok(_) => {}
+                Err(err) => println!("chunk task err: {:?}", err.to_string()),
+            });
         }
+        self.thread_pool.join();
         Ok(())
     }
 
@@ -62,7 +83,7 @@ impl FileWatcher {
                 0,
                 seek_flag,
                 &mut origin_fd,
-                path.file_name().unwrap().to_str().unwrap(),
+                path.to_str().unwrap(),
             )?;
             seek_flag += remaining_size;
             chunk_start += 1;
