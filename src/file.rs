@@ -28,7 +28,7 @@ impl FileWatcher {
     fn scan_parent_dir(&mut self, path: &str) -> &Self {
         match self.recursive_child_dir(Path::new(path)) {
             Ok(_) => println!("nothing todo"),
-            Err(err) => println!("some error occur.{:?}", err.to_string())
+            Err(err) => println!("some error occur.{:?}", err.to_string()),
         }
         self
     }
@@ -96,9 +96,9 @@ impl FileWatcher {
         let mut fd = File::create(file_name)?;
         origin_fd.seek(SeekFrom::Start(seek_flag))?;
         origin_fd.read(&mut buf)?;
-        match  fd.write(&mut buf) {
+        match fd.write(&mut buf) {
             Ok(_) => Ok(()),
-            Err(err) => {Err(err)},
+            Err(err) => Err(err),
         }
     }
 
