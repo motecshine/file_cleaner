@@ -14,6 +14,7 @@ pub struct FileWatcher {
     path: Vec<String>,
     chunk_size: u64,
     thread_pool: threadpool::ThreadPool,
+    thread_pool_num: usize,
 }
 
 #[inline]
@@ -29,6 +30,7 @@ pub fn new() -> Result<FileWatcher, Error> {
         path,
         chunk_size,
         thread_pool,
+        thread_pool_num,
     })
 }
 
@@ -49,19 +51,22 @@ impl FileWatcher {
                     self.recursive_child_dir(&file_or_path)?
                 } else {
                     let mut shadow = self.clone();
-                    self.thread_pool
-                        .execute(move || match shadow.chunk(file_or_path) {
-                            Ok(_) => {}
+                    self.thread_pool.execute(move || {
+                        match shadow.chunk(file_or_path) {
+                            Ok(_) => {},
                             Err(err) => println!("chunk task err: {:?}", err.to_string()),
-                        });
+                        }
+                    });
                 }
             }
         } else {
             let mut shadow = self.clone();
             let path = PathBuf::from(p);
-            self.thread_pool.execute(move || match shadow.chunk(path) {
-                Ok(_) => {}
-                Err(err) => println!("chunk task err: {:?}", err.to_string()),
+            self.thread_pool.execute(move || {
+                match shadow.chunk(path) {
+                            Ok(_) => {},
+                            Err(err) => println!("chunk task err: {:?}", err.to_string()),
+                        }
             });
         }
         self.thread_pool.join();
