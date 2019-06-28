@@ -10,6 +10,6 @@
 
 - [ ] Exclude Filter[过滤条件]
 
-- [ ] 删除文件
+- [x] 删除文件
 
 - [x] ThreadPool
