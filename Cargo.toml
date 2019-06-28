@@ -1,5 +1,5 @@
 [package]
-name = "file_cutter"
+name = "file_cleaner"
 version = "0.1.0"
 authors = ["朱海峰 <shinemotec@gmail.com>"]
 edition = "2018"
@@ -9,4 +9,3 @@ dotenv = { git= "https://github.com/dotenv-rs/dotenv.git" }
 dotenv_codegen = "0.14.1"
 failure = "0.1.5"
 threadpool = "1.7.1"
-futures-preview = { version = "=0.3.0-alpha.16", features = ["async-await", "nightly", "compat"] }

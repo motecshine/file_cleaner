@@ -36,7 +36,7 @@ impl<'a> DirScanner<'a> {
                 if file_or_path.is_dir() {
                     self.child_dir_scanner(file_or_path.as_path())?
                 } else {
-                    // send to file_cleaner
+
                     match file_or_path.to_str() {
                         Some(p) => match self.sender.send(p.to_string()) {
                             Ok(_) => {}
@@ -63,8 +63,9 @@ impl<'a> DirScanner<'a> {
     }
 
     pub fn run(&mut self) {
+        let ticker = env::var("SCAN_DIR_TICKER").unwrap().parse::<u64>().unwrap();
         loop {
-            sleep(Duration::from_secs(3));
+            sleep(Duration::from_secs(ticker));
             for path in self.dir.clone() {
                 self.scan_parent_dir(&path);
             }
