@@ -22,9 +22,7 @@ fn main() {
                 let mut fc_clone = file_cutter.clone();
                 println!("当前活跃worker:{:?}", thread_pool.active_count());
                 thread_pool.execute(move || match fc_clone.chunk(path) {
-                    Ok(_) => {
-
-                    },
+                    Ok(_) => {}
                     Err(err) => {
                         println!("recv err{:?}.", err);
                     }

@@ -23,8 +23,8 @@ impl FileCutter {
         let path = Path::new(&path_string);
         let origin_file_size = path.metadata()?.len();
         if origin_file_size <= self.chunk_size {
-            println!("[{:?}], 不需要处理!", path_string);
-            return Ok(())
+            println!("[{:?}], 不需要处理!", path.file_name());
+            return Ok(());
         }
         let remaining_size = origin_file_size % self.chunk_size;
         let mut origin_fd = File::open(&path)?;
