@@ -24,12 +24,20 @@ impl FileCleaner {
     pub fn clean(&mut self, path_string: String) -> io::Result<()> {
         let path = Path::new(&path_string);
         let origin_file_size = path.metadata()?.len();
-        let can_be_move_outdate_file = env::var("REMOVE_OUTDATE_FILE").unwrap().parse::<bool>().unwrap();
+        let can_be_move_outdate_file = env::var("REMOVE_OUTDATE_FILE")
+            .unwrap()
+            .parse::<bool>()
+            .unwrap();
 
         if can_be_move_outdate_file {
             let last_modified_time = path.metadata().unwrap().modified().unwrap();
-            let outdate_duration = env::var("OUTDATE_DURATION").unwrap().parse::<u64>().unwrap();
-            if std::time::SystemTime::now() > (last_modified_time + Duration::from_secs(outdate_duration))  {
+            let outdate_duration = env::var("OUTDATE_DURATION")
+                .unwrap()
+                .parse::<u64>()
+                .unwrap();
+            if std::time::SystemTime::now()
+                > (last_modified_time + Duration::from_secs(outdate_duration))
+            {
                 fs::remove_file(&path_string)?;
                 return Ok(());
             }
@@ -67,7 +75,10 @@ impl FileCleaner {
             )?;
             seek_flag += self.chunk_size;
         }
-        let can_be_move = env::var("FILE_CAN_BE_MOVE").unwrap().parse::<bool>().unwrap();
+        let can_be_move = env::var("FILE_CAN_BE_MOVE")
+            .unwrap()
+            .parse::<bool>()
+            .unwrap();
         if can_be_move {
             fs::remove_file(path_string)?;
         }
