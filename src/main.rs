@@ -8,7 +8,7 @@ pub mod file_cleaner;
 fn main() {
     dotenv().ok();
     let thread_pool_num = env::var("THREAD_POOL").unwrap().parse::<usize>().unwrap();
-    let thread_pool = ThreadPool::with_name("file_cutter_worker".to_string(), thread_pool_num);
+    let thread_pool = ThreadPool::with_name("file_cleaner_worker".to_string(), thread_pool_num);
     let (tx, rx) = std::sync::mpsc::channel::<String>();
     let mut tx_clone = tx.clone();
     thread_pool.execute(move || dir_scanner::new_dir_scanner(&mut tx_clone).unwrap().run());
