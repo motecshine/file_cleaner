@@ -1,2 +1,2 @@
-pub mod file; 
-pub mod failures;
+pub mod dir_scanner;
+pub mod file_cutter;
