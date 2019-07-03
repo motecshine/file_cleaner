@@ -9,6 +9,8 @@ use std::{fs, io};
 pub struct DirScanner<'a> {
     dir: Vec<String>,
     sender: &'a mut Sender<String>,
+    exclude_dir: Vec<String>,
+    file_extension: Vec<String>,
 }
 
 #[inline]
@@ -17,11 +19,25 @@ pub fn new_dir_scanner(sender: &mut Sender<String>) -> Result<DirScanner, Error>
         .split(",")
         .map(|s| s.to_string())
         .collect();
-    Ok(DirScanner { dir, sender })
+    let exclude_dir: Vec<String> = env::var("EXCLUDE_PATH")?
+        .split(",")
+        .map(|s| s.to_string())
+        .collect();
+    let file_extension: Vec<String> = env::var("FILE_SUFFIX")?
+        .split(",")
+        .map(|s| s.to_string())
+        .collect();
+    Ok(DirScanner {
+        dir,
+        sender,
+        exclude_dir,
+        file_extension,
+    })
 }
 
 impl<'a> DirScanner<'a> {
     fn scan_parent_dir(&mut self, path: &str) -> &Self {
+        // todo exclude path, log suffix regex.
         match self.child_dir_scanner(Path::new(path)) {
             Ok(_) => println!("scan child dir success."),
             Err(err) => println!("some error occur{:?}.", err.to_string()),
@@ -34,8 +50,22 @@ impl<'a> DirScanner<'a> {
             for entry in fs::read_dir(p)? {
                 let file_or_path = entry?.path();
                 if file_or_path.is_dir() {
+                    for v in &self.exclude_dir {
+                        if *v == file_or_path.to_str().unwrap().to_string() {
+                            println!(
+                                "排除扫描目录: {:?}, 当前扫描目录: {:?}",
+                                *v, file_or_path
+                            );
+                            return Ok(());
+                        }
+                    }
                     self.child_dir_scanner(file_or_path.as_path())?
                 } else {
+                    let file_extension = &file_or_path.with_extension().to_str().unwrap();
+                    if !self.check_file_ext(&file_extension) {
+                        println!("file_suffix cant be handle {:?}.", file_extension);
+                        return Ok(());
+                    }
                     match file_or_path.to_str() {
                         Some(p) => match self.sender.send(p.to_string()) {
                             Ok(_) => {}
@@ -48,6 +78,11 @@ impl<'a> DirScanner<'a> {
                 }
             }
         } else {
+            let file_extension = &p.extension().unwrap().to_str().unwrap();
+            if !self.check_file_ext(&file_extension) {
+                println!("file_suffix cant be handle {:?}.", file_extension);
+                return Ok(());
+            }
             match p.to_str() {
                 Some(path) => match self.sender.send(path.to_string()) {
                     Ok(_) => {}
@@ -59,6 +94,15 @@ impl<'a> DirScanner<'a> {
             }
         }
         Ok(())
+    }
+
+    pub fn check_file_ext(&mut self, extension: &str) -> bool {
+        for v in &self.file_extension {
+            if *v == extension {
+                return true;
+            }
+        }
+        false
     }
 
     pub fn run(&mut self) {

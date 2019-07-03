@@ -28,19 +28,17 @@ impl FileCleaner {
             .unwrap()
             .parse::<bool>()
             .unwrap();
-
-        if can_be_move_outdate_file {
-            let last_modified_time = path.metadata().unwrap().modified().unwrap();
-            let outdate_duration = env::var("OUTDATE_DURATION")
-                .unwrap()
-                .parse::<u64>()
-                .unwrap();
-            if std::time::SystemTime::now()
+        let last_modified_time = path.metadata().unwrap().modified().unwrap();
+        let outdate_duration = env::var("OUTDATE_DURATION")
+            .unwrap()
+            .parse::<u64>()
+            .unwrap();
+        if can_be_move_outdate_file
+            && std::time::SystemTime::now()
                 > (last_modified_time + Duration::from_secs(outdate_duration))
-            {
-                fs::remove_file(&path_string)?;
-                return Ok(());
-            }
+        {
+            fs::remove_file(&path_string)?;
+            return Ok(());
         }
 
         if origin_file_size <= self.chunk_size {
