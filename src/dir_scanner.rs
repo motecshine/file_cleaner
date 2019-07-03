@@ -61,7 +61,7 @@ impl<'a> DirScanner<'a> {
                     }
                     self.child_dir_scanner(file_or_path.as_path())?
                 } else {
-                    let file_extension = &file_or_path.with_extension().to_str().unwrap();
+                    let file_extension = file_or_path.extension().unwrap().to_str().unwrap();
                     if !self.check_file_ext(&file_extension) {
                         println!("file_suffix cant be handle {:?}.", file_extension);
                         return Ok(());
@@ -78,7 +78,7 @@ impl<'a> DirScanner<'a> {
                 }
             }
         } else {
-            let file_extension = &p.extension().unwrap().to_str().unwrap();
+            let file_extension = p.extension().unwrap().to_str().unwrap();
             if !self.check_file_ext(&file_extension) {
                 println!("file_suffix cant be handle {:?}.", file_extension);
                 return Ok(());
