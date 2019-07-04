@@ -52,10 +52,7 @@ impl<'a> DirScanner<'a> {
                 if file_or_path.is_dir() {
                     for v in &self.exclude_dir {
                         if *v == file_or_path.to_str().unwrap().to_string() {
-                            println!(
-                                "排除扫描目录: {:?}, 当前扫描目录: {:?}",
-                                *v, file_or_path
-                            );
+                            println!("exclude dir: {:?}, current dir: {:?}", *v, file_or_path);
                             continue;
                         }
                     }

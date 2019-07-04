@@ -20,7 +20,7 @@ fn main() {
         match rx.recv() {
             Ok(path) => {
                 let mut fc_clone = file_cleaner.clone();
-                println!("当前活跃worker:{:?}", thread_pool.active_count());
+                println!("current active worker:{:?}", thread_pool.active_count());
                 thread_pool.execute(move || match fc_clone.clean(path) {
                     Ok(_) => {}
                     Err(err) => {
