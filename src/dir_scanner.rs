@@ -56,15 +56,18 @@ impl<'a> DirScanner<'a> {
                                 "排除扫描目录: {:?}, 当前扫描目录: {:?}",
                                 *v, file_or_path
                             );
-                            return Ok(());
+                            continue;
                         }
                     }
                     self.child_dir_scanner(file_or_path.as_path())?
                 } else {
-                    let file_extension = file_or_path.extension().unwrap().to_str().unwrap();
-                    if !self.check_file_ext(&file_extension) {
-                        println!("file_suffix cant be handle {:?}.", file_extension);
-                        return Ok(());
+                    if !self.check_file_ext(&file_or_path) {
+                        println!(
+                            "file_suffix cant be handle {:?} {:?}.",
+                            file_or_path.file_name(),
+                            file_or_path.extension()
+                        );
+                        continue;
                     }
                     match file_or_path.to_str() {
                         Some(p) => match self.sender.send(p.to_string()) {
@@ -78,9 +81,8 @@ impl<'a> DirScanner<'a> {
                 }
             }
         } else {
-            let file_extension = p.extension().unwrap().to_str().unwrap();
-            if !self.check_file_ext(&file_extension) {
-                println!("file_suffix cant be handle {:?}.", file_extension);
+            if !self.check_file_ext(p) {
+                println!("file_suffix cant be handle {:?}.", p);
                 return Ok(());
             }
             match p.to_str() {
@@ -96,11 +98,17 @@ impl<'a> DirScanner<'a> {
         Ok(())
     }
 
-    pub fn check_file_ext(&mut self, extension: &str) -> bool {
-        for v in &self.file_extension {
-            if *v == extension {
-                return true;
+    pub fn check_file_ext(&mut self, file: &Path) -> bool {
+        match file.extension() {
+            Some(extension) => {
+                for v in &self.file_extension {
+                    if *v == extension.to_str().unwrap() {
+                        println!("{:?}", extension.to_str().unwrap());
+                        return true;
+                    }
+                }
             }
+            None => println!("extension not in whitelist, {:?} ", file),
         }
         false
     }
