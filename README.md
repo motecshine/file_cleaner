@@ -1,6 +1,5 @@
 # 日志文件清理工具
 
-## TODO
 
 - [x] 更优雅的处理错误(failure Crate)
 
@@ -8,7 +7,7 @@
 
 - [ ] 测试
 
-- [ ] Exclude Filter[过滤条件]
+- [x] Exclude Filter[过滤条件]
 
 - [x] 删除文件
 
