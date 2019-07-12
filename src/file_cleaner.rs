@@ -1,7 +1,7 @@
 use failure::Error;
 use std::env;
 use std::path::Path;
-use std::time::Duration;
+use std::time::{Duration,SystemTime, UNIX_EPOCH};
 use std::{
     fs,
     fs::File,
@@ -53,7 +53,6 @@ impl FileCleaner {
         if remaining_size > 0 {
             self.create_new_file(
                 remaining_size,
-                0,
                 seek_flag,
                 &mut origin_fd,
                 path.to_str().unwrap(),
@@ -63,10 +62,9 @@ impl FileCleaner {
             chunk_count += 1;
         }
 
-        for index in chunk_start..chunk_count {
+        for _ in chunk_start..chunk_count {
             self.create_new_file(
                 self.chunk_size,
-                index,
                 seek_flag,
                 &mut origin_fd,
                 path.to_str().unwrap(),
@@ -87,12 +85,12 @@ impl FileCleaner {
     fn create_new_file(
         &mut self,
         buf_size: u64,
-        file_suffix: u64,
+
         seek_flag: u64,
         origin_fd: &mut File,
         origin_file_name: &str,
     ) -> io::Result<()> {
-        let file_name = self.new_file_name(origin_file_name, file_suffix);
+        let file_name = self.new_file_name(origin_file_name);
         let mut buf = Box::new(vec![0; buf_size as usize]);
         let mut fd = File::create(file_name)?;
         origin_fd.seek(SeekFrom::Start(seek_flag))?;
@@ -103,7 +101,11 @@ impl FileCleaner {
         }
     }
 
-    fn new_file_name(&mut self, origin_file_name: &str, suffix: u64) -> String {
-        origin_file_name.to_owned() + "_" + suffix.to_string().as_str()
+    fn new_file_name(&mut self, origin_file_name: &str) -> String {
+        let time = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as i64;
+        origin_file_name.to_owned() + "_" + time.to_string().as_str()
     }
 }
