@@ -38,7 +38,7 @@ pub fn new_dir_scanner(sender: &mut Sender<String>) -> Result<DirScanner, Error>
 impl<'a> DirScanner<'a> {
     fn scan_parent_dir(&mut self, path: &str) {
         match self.child_dir_scanner(Path::new(path)) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(err) => println!("some error occur{:?}.", err.to_string()),
         }
     }
@@ -98,7 +98,11 @@ impl<'a> DirScanner<'a> {
             Some(extension) => {
                 for v in &self.file_extension {
                     if extension.to_str().unwrap().contains(v) {
-                        println!("actually ext: {:?}, ext: {:?}", extension.to_str().unwrap(), v);
+                        println!(
+                            "actually ext: {:?}, ext: {:?}",
+                            extension.to_str().unwrap(),
+                            v
+                        );
                         return true;
                     }
                 }

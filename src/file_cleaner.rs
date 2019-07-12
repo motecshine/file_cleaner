@@ -1,7 +1,7 @@
 use failure::Error;
 use std::env;
 use std::path::Path;
-use std::time::{Duration,SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use std::{
     fs,
     fs::File,
@@ -76,7 +76,10 @@ impl FileCleaner {
             .parse::<bool>()
             .unwrap();
         if can_be_move {
-            fs::remove_file(path_string)?;
+            // 非安全操作, 如果文件非常大会占满IO
+            fs::remove_file(&path_string)?;
+
+            fs::File::create(&path_string)?;
         }
         Ok(())
     }
